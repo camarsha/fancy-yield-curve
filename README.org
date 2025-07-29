@@ -1,0 +1,66 @@
+* Installation
+
+If you are on linux install rust via:
+
+#+begin_src bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+#+end_src
+
+Next in order to install the python package you will need maturin:
+
+#+begin_src bash
+  pip install maturin
+#+end_src
+
+After all of this you should be able to run ~make~ which will install the python package.
+
+* Usage
+** Basic Yield Curve
+Import the package in python. Right now it is called ~fancy_yield_curve~ and can calculate basic yield curves (i.e from resonances) using a function ~yield curve~:
+
+#+begin_src python
+  from fancy_yield_curve import yield_curve
+
+  # This takes resonance energy, resonance width, beam fwhm, yield height,
+  # target width, straggle constant, start energy, stop energy, and integration step size
+
+  er = 992.0 # 992 keV
+  width = 0.1 # 100 eV width
+  beam_width = 0.5 # 500 eV fwhm
+  height = 10.0 # arbitrary
+  dx = 15.0 # 15 keV thick
+  sc = 1.2 # straggle constant depends on target
+  start = 900.0 # start integration at 900 keV
+  stop = 1050.0 # stop at 1050
+  step = 0.1 # 100 eV steps
+
+  yield_curve(er, width, beam_width, height, dx, sc, start, stop, step)
+#+end_src
+
+- This will return two lists of energy and yield.
+** Direct Capture Line Shape
+ The package now supports the calculation of a direct capture line shape:
+ #+begin_src python
+   dc = fancy_yield_curve.DirectCapture(
+       1.007276467488874,  # mass projectile
+       11.996709642876272,  # mass target
+       13.001900171928781,  # mass of recoil
+       "AZUREOut_aa=1_R=2.extrap",  # cross section file
+   )
+
+   # calculate the curve
+   e_beam = 440.0
+   det_fwhm = 3.0
+   height = 60.0  # arbitrary normalization
+   straggle = 2.0  # target straggling
+   start = 350.0  # grid start
+   stop = 500.0  # grid stop
+   de = 0.1  # grid spacing
+   e, y = dc.yield_curve(e_beam, det_fwhm, height, straggle, start, stop, de)
+   # if you want the gamma energy
+   Ex = 0.0  # excited state of the transition
+   ang = 90.0  # lab angle
+   e_g = fancy_yield_curve.calc_gamma(
+       dc.proj_mass, dc.target_mass, dc.recoil_mass, np.asarray(e), Ex, ang
+   )
+ #+end_src
