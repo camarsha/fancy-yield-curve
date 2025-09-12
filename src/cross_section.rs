@@ -34,7 +34,6 @@ impl CrossSection {
         interp.init(&energies, &cs_values).unwrap();
         let mut interp_acc = InterpAccel::new();
         // find the max value for normalization
-        // let max_value = cs_values.iter().cloned().fold(0.0 / 0.0, f64::max);
         let max_value = interpolation::eval(
             &interp,
             &energies,

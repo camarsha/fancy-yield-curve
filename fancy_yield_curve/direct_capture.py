@@ -1,4 +1,11 @@
-from .fancy_yield_curve import calc_direct_capture_yield
+from .fancy_yield_curve import (
+    calc_direct_capture_yield,
+    calc_direct_capture_yield_target_profile,
+    add_layer,
+    replace_layer,
+    remove_layer,
+    clear_layers,
+)
 import numpy as np
 
 
@@ -65,7 +72,13 @@ def com_cs_conversion(ma, mA, elab, theta):
 
 
 class DirectCapture:
-    def __init__(self, proj_mass, target_mass, recoil_mass, cs_file_name):
+    def __init__(
+        self,
+        proj_mass,
+        target_mass,
+        recoil_mass,
+        cs_file_name,
+    ):
         self.energies_com, self.theta_com, self.cs_com = read_azure_file(
             cs_file_name
         )
@@ -117,4 +130,65 @@ class DirectCapture:
             e_p,
             0.0,
             angle,
+        )
+
+
+class DirectCaptureDepthProfile(DirectCapture):
+    def __init__(self, proj_mass, target_mass, recoil_mass, cs_file_name):
+        super().__init__(proj_mass, target_mass, recoil_mass, cs_file_name)
+        self._layers = {}
+
+    def _normalize_layers(self, layers):
+        s = sum(layers)
+        return [x / s for x in layers]
+
+    def add_layer(self, layer_name, dx, layer_composition, stopping_powers):
+        layer_composition = self._normalize_layers(layer_composition)
+        idx = add_layer(dx, layer_composition, stopping_powers)
+        self._layers[layer_name] = (idx, dx, layer_composition, stopping_powers)
+
+    def replace_layer(self, layer_name, dx, layer_composition, stopping_powers):
+        layer_composition = self._normalize_layers(layer_composition)
+        idx, *_ = self._layers[layer_name]
+        self._layers[layer_name] = (idx, dx, layer_composition, stopping_powers)
+        replace_layer(idx, dx, layer_composition, stopping_powers)
+
+    def remove_layer(self, layer_name):
+        idx, *_ = self._layers[layer_name]
+        remove_layer(idx)
+        del self._layers[layer_name]
+        # We need to update the index for all layers that come after
+        for k, (v, *others) in self._layers.items():
+            if v > idx:
+                self._layers[k] = (v - 1, *others)
+
+    def clear_layers(self):
+        clear_layers()
+        self._layers = {}
+
+    def get_layer(self, layer_name):
+        return self._layers[layer_name]
+
+    def yield_curve(
+        self,
+        e_beam,
+        beam_fwhm,
+        det_fwhm,
+        height,
+        straggle_const,
+        start,
+        stop,
+        step,
+    ):
+        return calc_direct_capture_yield_target_profile(
+            e_beam,
+            beam_fwhm,
+            det_fwhm,
+            height,
+            straggle_const,
+            self.energies,
+            self.cs,
+            start,
+            stop,
+            step,
         )
