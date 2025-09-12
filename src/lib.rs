@@ -240,11 +240,14 @@ fn calc_direct_capture_yield_target_profile(
     start_energy: f64,
     stop_energy: f64,
     step_size: f64,
-) -> (Vec<f64>, Vec<f64>) {
+) -> PyResult<(Vec<f64>, Vec<f64>)> {
     let mut cross_section = CrossSection::new(cs_energies, cs_values, e_beam);
 
     let binding = TARGET_LAYERS.lock().unwrap();
-    let layers = (*binding).as_ref().expect("No layers for the target!");
+    let layers = match (*binding).as_ref() {
+        Some(v) => v,
+        None => return Err(exceptions::PyIndexError::new_err("no layers defined")),
+    };
 
     let mut profile_target = target_profile::TargetProfile::new(e_beam, layers);
     let num_points = (stop_energy - start_energy) / step_size;
@@ -297,7 +300,7 @@ fn calc_direct_capture_yield_target_profile(
         .map(|&energy| simple_yield::beam_spread_point(energy, det_fwhm, &energy_grid, &yield_grid))
         .collect();
 
-    (energy_grid, target_grid)
+    Ok((energy_grid, det_spread))
 }
 
 /// A Python module implemented in Rust. The name of this function must match

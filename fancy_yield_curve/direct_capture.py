@@ -39,7 +39,7 @@ def calc_gamma(m_a, m_A, m_B, E_beam, E_x, theta):
     :returns: gamma ray energy in MeV
 
     """
-
+    E_beam = np.asarray(E_beam)
     # conversions
     theta *= np.pi / 180.0
     m_a *= amu_to_kev
