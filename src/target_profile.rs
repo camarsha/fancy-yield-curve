@@ -104,8 +104,8 @@ impl TargetProfile {
         height_target.reverse();
         // Interpolate
         let interp_type = InterpType::linear(); // Linear avoids issues for the steps
-        let mut interp =
-            Interp::new(interp_type, energies.len()).expect("Failed to initialize TargetProfile spline.");
+        let mut interp = Interp::new(interp_type, energies.len())
+            .expect("Failed to initialize TargetProfile spline.");
         interp.init(&energies, &height_target).unwrap();
         let mut interp_acc = InterpAccel::new();
         let min_value = *energies.first().unwrap();

@@ -22,7 +22,6 @@ pub struct CrossSection {
     cs_values: Vec<f64>,
     interp: Interp,
     interp_acc: InterpAccel,
-    max_value: f64,
 }
 
 impl CrossSection {
@@ -34,20 +33,11 @@ impl CrossSection {
         interp.init(&energies, &cs_values).unwrap();
         let mut interp_acc = InterpAccel::new();
         // find the max value for normalization
-        let max_value = interpolation::eval(
-            &interp,
-            &energies,
-            &cs_values,
-            e_beam,
-            &mut interp_acc,
-        );
-        
         CrossSection {
             energies,
             cs_values,
             interp,
             interp_acc,
-            max_value,
         }
     }
 
@@ -59,7 +49,7 @@ impl CrossSection {
             &self.cs_values,
             energy,
             &mut self.interp_acc,
-        ) * (height / self.max_value)
+        ) * height
             * target_point
     }
 }

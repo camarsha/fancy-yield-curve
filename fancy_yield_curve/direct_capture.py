@@ -1,6 +1,8 @@
 from .fancy_yield_curve import (
     calc_direct_capture_yield,
+    calc_direct_capture_yield_complete,
     calc_direct_capture_yield_target_profile,
+    calc_direct_capture_yield_target_profile_complete,
     add_layer,
     replace_layer,
     remove_layer,
@@ -181,6 +183,30 @@ class DirectCaptureDepthProfile(DirectCapture):
         step,
     ):
         return calc_direct_capture_yield_target_profile(
+            e_beam,
+            beam_fwhm,
+            det_fwhm,
+            height,
+            straggle_const,
+            self.energies,
+            self.cs,
+            start,
+            stop,
+            step,
+        )
+
+    def yield_curve_components(
+        self,
+        e_beam,
+        beam_fwhm,
+        det_fwhm,
+        height,
+        straggle_const,
+        start,
+        stop,
+        step,
+    ):
+        return calc_direct_capture_yield_target_profile_complete(
             e_beam,
             beam_fwhm,
             det_fwhm,
