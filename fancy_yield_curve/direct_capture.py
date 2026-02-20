@@ -51,10 +51,7 @@ def calc_gamma(m_a, m_A, m_B, E_beam, E_x, theta):
     numer = E_beam * m_A + (q * (m_a + m_A + m_B) / 2.0)
 
     denom = (
-        m_a
-        + m_A
-        + E_beam
-        - (np.cos(theta) * np.sqrt(E_beam * (2.0 * m_a + E_beam)))
+        m_a + m_A + E_beam - (np.cos(theta) * np.sqrt(E_beam * (2.0 * m_a + E_beam)))
     )
     return numer / denom
 
@@ -81,15 +78,11 @@ class DirectCapture:
         recoil_mass,
         cs_file_name,
     ):
-        self.energies_com, self.theta_com, self.cs_com = read_azure_file(
-            cs_file_name
-        )
+        self.energies_com, self.theta_com, self.cs_com = read_azure_file(cs_file_name)
         self.proj_mass = proj_mass
         self.target_mass = target_mass
         self.recoil_mass = recoil_mass
-        self.energies = self.energies_com * (
-            (proj_mass + target_mass) / target_mass
-        )
+        self.energies = self.energies_com * ((proj_mass + target_mass) / target_mass)
         self.conv = com_cs_conversion(
             proj_mass,
             target_mass,
@@ -111,6 +104,32 @@ class DirectCapture:
         step,
     ):
         return calc_direct_capture_yield(
+            e_beam,
+            beam_fwhm,
+            det_fwhm,
+            height,
+            dx,
+            straggle_const,
+            self.energies,
+            self.cs,
+            start,
+            stop,
+            step,
+        )
+
+    def yield_curve_components(
+        self,
+        e_beam,
+        beam_fwhm,
+        det_fwhm,
+        height,
+        dx,
+        straggle_const,
+        start,
+        stop,
+        step,
+    ):
+        return calc_direct_capture_yield_complete(
             e_beam,
             beam_fwhm,
             det_fwhm,

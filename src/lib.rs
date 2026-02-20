@@ -96,7 +96,7 @@ fn clear_layers() -> PyResult<()> {
 }
 
 #[pyfunction]
-fn yield_curve(
+fn yield_curve_basic(
     e_res: f64,
     width_res: f64,
     beam_fwhm: f64,
@@ -541,7 +541,7 @@ fn fancy_yield_curve(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(remove_layer, m)?)?;
     m.add_function(wrap_pyfunction!(print_layer, m)?)?;
     m.add_function(wrap_pyfunction!(clear_layers, m)?)?;
-    m.add_function(wrap_pyfunction!(yield_curve, m)?)?;
+    m.add_function(wrap_pyfunction!(yield_curve_basic, m)?)?;
     m.add_function(wrap_pyfunction!(yield_curve_complete, m)?)?;
     m.add_function(wrap_pyfunction!(calc_direct_capture_yield, m)?)?;
     m.add_function(wrap_pyfunction!(calc_direct_capture_yield_complete, m)?)?;
