@@ -70,7 +70,7 @@ pub fn simple_straggle_point(
     energy_grid: &[f64],
     yield_grid: &[f64],
 ) -> f64 {
-    if energy <= e_res {
+    if (energy <= e_res) || (straggle_const == 0.0) {
         let idx = energy_grid.iter().position(|&e| e == energy).unwrap();
         return yield_grid[idx];
     }
